@@ -84,6 +84,8 @@ func (c *Core) AddUsers(p *vCore.AddUsersParams) (added int, err error) {
 			p.Users,
 			p.Shadowsocks.Cipher,
 			p.Shadowsocks.ServerKey)
+	case "socks":
+		users = buildSocksUsers(p.Tag, p.Users)
 	default:
 		return 0, fmt.Errorf("unsupported node type: %s", p.NodeInfo.Type)
 	}

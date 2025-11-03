@@ -13,3 +13,8 @@ example/.lego
 example/cert
 ./vscode
 .idea/*
+# V2bX Socks5 编译产物和大文件
+V2bX-linux-amd64
+V2bX-socks5-linux-amd64.tar.gz
+*.tar.gz
+dist_socks/*.tar.gz

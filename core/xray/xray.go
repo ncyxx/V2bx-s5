@@ -192,6 +192,7 @@ func (c *Core) Protocols() []string {
 		"vless",
 		"shadowsocks",
 		"trojan",
+		"socks",
 	}
 }
 

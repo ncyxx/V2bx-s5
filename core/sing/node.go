@@ -202,6 +202,8 @@ func getInboundOptions(tag string, info *panel.NodeInfo, c *conf.Options) (optio
 			Obfs:          info.Hysteria.Obfs,
 			TLS:           &tls,
 		}
+	default:
+		return option.Inbound{}, fmt.Errorf("unsupported node type: %s", info.Type)
 	}
 	return in, nil
 }

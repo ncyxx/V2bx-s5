@@ -31,8 +31,11 @@ func buildInbound(option *conf.Options, nodeInfo *panel.NodeInfo, tag string) (*
 	case "shadowsocks":
 		err = buildShadowsocks(option, nodeInfo, in)
 		network = "tcp"
+	case "socks":
+		err = buildSocks(option, in)
+		network = "tcp"
 	default:
-		return nil, fmt.Errorf("unsupported node type: %s, Only support: V2ray, Trojan, Shadowsocks", nodeInfo.Type)
+		return nil, fmt.Errorf("unsupported node type: %s, Only support: V2ray, Trojan, Shadowsocks, Socks", nodeInfo.Type)
 	}
 	if err != nil {
 		return nil, err
@@ -196,25 +199,17 @@ func buildV2ray(config *conf.Options, nodeInfo *panel.NodeInfo, inbound *coreCon
 	return nil
 }
 
-func buildTrojan(config *conf.Options, inbound *coreConf.InboundDetourConfig) error {
-	inbound.Protocol = "trojan"
-	if config.XrayOptions.EnableFallback {
-		// Set fallback
-		fallbackConfigs, err := buildTrojanFallbacks(config.XrayOptions.FallBackConfigs)
-		if err != nil {
-			return err
-		}
-		s, err := json.Marshal(&coreConf.TrojanServerConfig{
-			Fallbacks: fallbackConfigs,
-		})
-		inbound.Settings = (*json.RawMessage)(&s)
-		if err != nil {
-			return fmt.Errorf("marshal trojan fallback config error: %s", err)
-		}
-	} else {
-		s := []byte("{}")
-		inbound.Settings = (*json.RawMessage)(&s)
+func buildSocks(_ *conf.Options, inbound *coreConf.InboundDetourConfig) error {
+	inbound.Protocol = "socks"
+	settings := &coreConf.SocksServerConfig{
+		AuthMethod: coreConf.AuthMethodUserPass,
+		UDP:        true,
 	}
+	s, err := json.Marshal(settings)
+	if err != nil {
+		return fmt.Errorf("marshal socks settings error: %s", err)
+	}
+	inbound.Settings = (*json.RawMessage)(&s)
 	t := coreConf.TransportProtocol("tcp")
 	inbound.StreamSetting = &coreConf.StreamConfig{Network: &t}
 	return nil
@@ -255,6 +250,30 @@ func buildShadowsocks(config *conf.Options, nodeInfo *panel.NodeInfo, inbound *c
 	if err != nil {
 		return fmt.Errorf("marshal shadowsocks settings error: %s", err)
 	}
+	return nil
+}
+
+func buildTrojan(config *conf.Options, inbound *coreConf.InboundDetourConfig) error {
+	inbound.Protocol = "trojan"
+	if config.XrayOptions.EnableFallback {
+		// Set fallback
+		fallbackConfigs, err := buildTrojanFallbacks(config.XrayOptions.FallBackConfigs)
+		if err != nil {
+			return err
+		}
+		s, err := json.Marshal(&coreConf.TrojanServerConfig{
+			Fallbacks: fallbackConfigs,
+		})
+		inbound.Settings = (*json.RawMessage)(&s)
+		if err != nil {
+			return fmt.Errorf("marshal trojan fallback config error: %s", err)
+		}
+	} else {
+		s := []byte("{}")
+		inbound.Settings = (*json.RawMessage)(&s)
+	}
+	t := coreConf.TransportProtocol("tcp")
+	inbound.StreamSetting = &coreConf.StreamConfig{Network: &t}
 	return nil
 }
 

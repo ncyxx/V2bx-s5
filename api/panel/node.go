@@ -34,6 +34,7 @@ type NodeInfo struct {
 	Trojan      *TrojanNode
 	Hysteria    *HysteriaNode
 	Common      *CommonNode
+	Socks       *CommonNode
 }
 
 type CommonNode struct {
@@ -189,6 +190,15 @@ func (c *Client) GetNodeInfo() (node *NodeInfo, err error) {
 		cm = &rsp.CommonNode
 		node.Hysteria = rsp
 		node.Security = Tls
+	case "socks":
+		rsp := &CommonNode{}
+		err = json.Unmarshal(r.Body(), rsp)
+		if err != nil {
+			return nil, fmt.Errorf("decode v2ray params error: %s", err)
+		}
+		cm = rsp
+		node.Socks = rsp
+		node.Security = None
 	}
 
 	// parse rules and dns
