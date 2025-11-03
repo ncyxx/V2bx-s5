@@ -145,9 +145,8 @@ install_V2bX() {
     cp geosite.dat /etc/V2bX/
 
     if [[ ! -f /etc/V2bX/config.json ]]; then
-        cp config.json /etc/V2bX/
         echo -e ""
-        echo -e "全新安装，请先参看教程：https://github.com/InazumaV/V2bX/tree/master/example，配置必要的内容"
+        echo -e "全新安装，请使用配置向导生成配置文件"
         first_install=true
     else
         systemctl start V2bX
