@@ -183,19 +183,16 @@ install_V2bX() {
 
   cp geoip.dat /etc/V2bX/
   cp geosite.dat /etc/V2bX/
-  if [[ ! -f /etc/V2bX/config.json ]]; then
-    cp config.json /etc/V2bX/
+
+  # 保留示例配置文件供参考
+  if [[ ! -f /etc/V2bX/config.json.example ]]; then
+    cp config.json /etc/V2bX/config.json.example
   fi
 
   install_service_files
 
-  systemctl start V2bX
-  sleep 2
-  if systemctl is-active --quiet V2bX; then
-    echo -e "${green}V2bX 启动成功。${plain}"
-  else
-    echo -e "${yellow}V2bX 可能启动失败，请运行 'V2bX log' 查看日志。${plain}"
-  fi
+  # 首次安装不启动服务，等待用户配置
+  echo -e "${yellow}已安装 V2bX，等待配置后启动...${plain}"
 
   cd "${cur_dir}"
 }
@@ -224,12 +221,38 @@ EOF
 }
 
 prompt_generate_config() {
-  if [[ ! -f /etc/V2bX/config.json ]] || [[ ! -s /etc/V2bX/config.json ]]; then
-    echo -ne "${yellow}检测到为首次安装，是否立即生成配置文件?(y/n): ${plain}"
-    read -r if_generate
-    if [[ $if_generate =~ ^[Yy]$ ]]; then
-      /usr/local/V2bX/initconfig.sh
+  echo ""
+  echo -e "${green}===========================================================${plain}"
+  echo -e "${green}V2bX 安装完成！${plain}"
+  echo -e "${green}===========================================================${plain}"
+  echo ""
+  echo -e "${yellow}接下来需要配置 V2bX 连接到您的 XBoard 面板。${plain}"
+  echo ""
+  echo -ne "${yellow}是否立即生成配置文件? (y/n): ${plain}"
+  read -r if_generate
+  if [[ $if_generate =~ ^[Yy]$ ]]; then
+    /usr/local/V2bX/initconfig.sh
+    echo ""
+    echo -e "${green}配置完成！正在重启 V2bX 服务...${plain}"
+    systemctl restart V2bX
+    sleep 2
+    if systemctl is-active --quiet V2bX; then
+      echo -e "${green}✅ V2bX 服务已成功启动！${plain}"
+      echo ""
+      echo -e "使用以下命令管理服务："
+      echo -e "  ${green}V2bX status${plain}   - 查看运行状态"
+      echo -e "  ${green}V2bX log${plain}      - 查看日志"
+      echo -e "  ${green}V2bX restart${plain}  - 重启服务"
+    else
+      echo -e "${red}❌ V2bX 启动失败，请检查配置。${plain}"
+      echo -e "运行 ${green}V2bX log${plain} 查看详细日志"
     fi
+  else
+    echo ""
+    echo -e "${yellow}⚠️  您选择稍后配置。${plain}"
+    echo -e "请在配置完成后运行以下命令："
+    echo -e "  ${green}V2bX generate${plain}  - 生成配置文件"
+    echo -e "  ${green}V2bX restart${plain}   - 重启服务"
   fi
 }
 
