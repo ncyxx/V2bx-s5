@@ -10,7 +10,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-resty/resty/v2 v2.7.0
-	github.com/goccy/go-json v0.10.2
+	github.com/goccy/go-json v0.10.5
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/inazumav/sing-box v0.0.0-20230910163731-3c2fdcaf9d80
 	github.com/juju/ratelimit v1.0.2
