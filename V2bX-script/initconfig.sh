@@ -178,9 +178,11 @@ generate_config_file() {
 
     # 切换到配置文件目录
     cd /etc/V2bX
-    
-    # 备份旧的配置文件
-    mv config.json config.json.bak
+
+    # 备份旧的配置文件(如果存在)
+    if [ -f config.json ]; then
+        mv config.json config.json.bak
+    fi
     formatted_nodes_config=$(echo "${nodes_config[*]}" | sed 's/,\s*$//')
     
     # 创建 config.json 文件
