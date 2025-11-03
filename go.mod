@@ -14,12 +14,12 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/inazumav/sing-box v0.0.0-20230910163731-3c2fdcaf9d80
 	github.com/juju/ratelimit v1.0.2
-	github.com/sagernet/sing v0.2.10-0.20230907044649-03c21c0a1205
+	github.com/sagernet/sing v0.8.0-beta.6
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.7.0
 	github.com/xtls/xray-core v1.8.4
 	golang.org/x/crypto v0.13.0
-	golang.org/x/sys v0.12.0
+	golang.org/x/sys v0.21.0
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
@@ -180,8 +180,8 @@ require (
 	github.com/softlayer/xmlrpc v0.0.0-20200409220501-5f089df7cb7e // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stretchr/objx v0.5.0 // indirect
-	github.com/stretchr/testify v1.8.4 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
+	github.com/stretchr/testify v1.9.0 // indirect
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.490 // indirect
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dnspod v1.0.490 // indirect
 	github.com/transip/gotransip/v6 v6.20.0 // indirect
