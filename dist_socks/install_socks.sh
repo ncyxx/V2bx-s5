@@ -15,16 +15,16 @@ RELEASE_REPO="${RELEASE_REPO:-$RELEASE_REPO_DEFAULT}"
 
 cur_dir=$(pwd)
 
-[[ $EUID -ne 0 ]] && {
+if [[ $EUID -ne 0 ]]; then
   echo -e "${red}错误：${plain}必须使用 root 用户运行此脚本。"
   exit 1
-}
+fi
 
 download_asset() {
-  local name=$1
-  local dest=$2
+  local name="$1"
+  local dest="$2"
   if ! curl -fsSL "${ASSET_BASE}/${name}" -o "${dest}"; then
-    echo -e "${red}下载 ${name} 失败，请检查 ASSET_BASE 设置或网络。${plain}"
+    echo -e "${red}下载 ${name} 失败，请检查 ASSET_BASE 设置或网络连通性。${plain}"
     exit 1
   fi
 }
@@ -47,7 +47,7 @@ detect_os() {
   else
     echo -e "${red}未检测到支持的系统版本，请联系脚本作者。${plain}"
     exit 1
-  }
+  fi
 }
 
 detect_arch() {
@@ -80,20 +80,20 @@ check_os_version() {
   fi
 
   if [[ x"${release}" == x"centos" ]]; then
-    [[ -n "$os_version" && ${os_version} -le 6 ]] && {
+    if [[ -n "$os_version" && ${os_version} -le 6 ]]; then
       echo -e "${red}请使用 CentOS 7 或以上版本。${plain}"
       exit 1
-    }
+    fi
   elif [[ x"${release}" == x"ubuntu" ]]; then
-    [[ -n "$os_version" && ${os_version} -lt 16 ]] && {
+    if [[ -n "$os_version" && ${os_version} -lt 16 ]]; then
       echo -e "${red}请使用 Ubuntu 16 或以上版本。${plain}"
       exit 1
-    }
+    fi
   elif [[ x"${release}" == x"debian" ]]; then
-    [[ -n "$os_version" && ${os_version} -lt 8 ]] && {
+    if [[ -n "$os_version" && ${os_version} -lt 8 ]]; then
       echo -e "${red}请使用 Debian 8 或以上版本。${plain}"
       exit 1
-    }
+    fi
   fi
 }
 
@@ -120,7 +120,7 @@ download_release() {
   local version="$1"
   local url="https://github.com/${RELEASE_REPO}/releases/download/${version}/V2bX-linux-${arch}.zip"
   if ! wget -q -O /usr/local/V2bX/V2bX-linux.zip --no-check-certificate "${url}"; then
-    echo -e "${red}下载 V2bX 发行包失败 (${url})，请确认版本和仓库。${plain}"
+    echo -e "${red}下载 V2bX 发行包失败：${url}${plain}"
     exit 1
   fi
 }
@@ -129,16 +129,14 @@ install_socks_assets() {
   mkdir -p /usr/local/V2bX
   mkdir -p /etc/V2bX
 
-  download_asset "custom_inbound.json" "/usr/local/V2bX/custom_inbound.json"
   download_asset "initconfig.sh" "/usr/local/V2bX/initconfig.sh"
-  download_asset "custom_outbound.json" "/usr/local/V2bX/custom_outbound.json"
-  download_asset "route.json" "/usr/local/V2bX/route.json"
-  download_asset "dns.json" "/usr/local/V2bX/dns.json"
-
   chmod +x /usr/local/V2bX/initconfig.sh
 
-  for file in custom_inbound.json custom_outbound.json route.json dns.json; do
-    [[ ! -f "/etc/V2bX/${file}" ]] && cp "/usr/local/V2bX/${file}" "/etc/V2bX/${file}"
+  for name in custom_inbound.json custom_outbound.json route.json dns.json; do
+    download_asset "${name}" "/usr/local/V2bX/${name}"
+    if [[ ! -f "/etc/V2bX/${name}" ]]; then
+      cp "/usr/local/V2bX/${name}" "/etc/V2bX/${name}"
+    fi
   done
 }
 
@@ -185,7 +183,9 @@ install_V2bX() {
 
   cp geoip.dat /etc/V2bX/
   cp geosite.dat /etc/V2bX/
-  [[ ! -f /etc/V2bX/config.json ]] && cp config.json /etc/V2bX/
+  if [[ ! -f /etc/V2bX/config.json ]]; then
+    cp config.json /etc/V2bX/
+  fi
 
   install_service_files
 
